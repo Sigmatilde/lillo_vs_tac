@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Platformer Boss Fight - COTOLETTINE</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background-color: #87CEEB; 
+            overflow: hidden;
+            font-family: sans-serif;
+        }
+        canvas {
+            width: 100vw;
+            height: 100vh;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <script src="https://unpkg.com/kaboom@3000/dist/kaboom.js"></script>
+    <script>
+        kaboom({
+            width: 800,
+            height: 450,
+            background: [135, 206, 235],
+            global: true,
+            fullscreen: true,
+            scale: 1,
+        });
+
+        // Load the local image you just saved
+        loadSprite("start-cover", "./cover.png");
+
+        // The base64 string for the boss face
+        const bossBase64 =
+            "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";
+
+        loadSprite("boss-img", "data:image/png;base64," + bossBase64);
+
+        let playerName = "";
+        let score = 0;
+
+        function finishGame(won) {
+            if (won) {
+                score += 300;
+            }
+            let ranking = [];
+            try {
+                const stored = localStorage.getItem("ranking");
+                if (stored) {
+                    ranking = JSON.parse(stored);
+                    if (!Array.isArray(ranking)) ranking = [];
+                }
+            } catch (e) {
+                ranking = [];
+            }
+            ranking.push({ name: playerName, score: score });
+            ranking.sort((a, b) => b.score - a.score);
+            try {
+                localStorage.setItem("ranking", JSON.stringify(ranking));
+            } catch (e) {
+            }
+            go("ranking");
+        }
+
+        // --- NEW COVER SCENE ---
+        scene("cover", () => {
+            // Draw the cover image as the background
+            add([
+                sprite("start-cover"),
+                pos(width() / 2, height() / 2),
+                anchor("center"),
+                // Scale it to fit the screen
+                scale(width() / 1024) 
+            ]);
+
+            // Add a START button box
+            const btn = add([
+                rect(200, 60, { radius: 8 }),
+                pos(width() / 2, height() - 80),
+                anchor("center"),
+                color(255, 204, 0), // Yellow color
+                area(), // Needed to make it clickable
+                "startBtn" // Tag to identify the button
+            ]);
+
+            // Text on the button
+            add([
+                text("START", { size: 32 }),
+                pos(width() / 2, height() - 80),
+                anchor("center"),
+                color(0, 0, 0), // Black text
+            ]);
+
+            // Hover effects: change color and cursor when mouse is over it
+            onHover("startBtn", (b) => {
+                b.color = rgb(255, 255, 100); // Lighter yellow
+                setCursor("pointer");
+            });
+
+            onHoverEnd("startBtn", (b) => {
+                b.color = rgb(255, 204, 0); // Back to original yellow
+                setCursor("default");
+            });
+
+            // What happens when you click the button
+            onClick("startBtn", () => {
+                setCursor("default"); // Reset cursor
+                go("start"); // Move to the name entry scene!
+            });
+        });
+
+        // --- EXISTING START/NAME ENTRY SCENE ---
+        scene("start", () => {
+            let entered = "";
+            const prompt = add([
+                text("Enter your name:", { size: 32, width: width() - 40, align: "center" }),
+                pos(width() / 2, height() / 3),
+                anchor("center"),
+                fixed(),
+            ]);
+            const nameDisplay = add([
+                text(entered, { size: 24, width: width() - 40, align: "center" }),
+                pos(width() / 2, height() / 2),
+                anchor("center"),
+                fixed(),
+            ]);
+            add([
+                text("Type and press Enter to start", { size: 16, width: width() - 40, align: "center" }),
+                pos(width() / 2, height() * 2 / 3),
+                anchor("center"),
+                fixed(),
+            ]);
+
+            onCharInput((ch) => {
+                entered += ch;
+                nameDisplay.text = entered;
+            });
+            onKeyPress("backspace", () => {
+                entered = entered.slice(0, -1);
+                nameDisplay.text = entered;
+            });
+            onKeyPress("enter", () => {
+                playerName = entered.trim() || "Player";
+                go("game", { level: 1 }); // Start at level 1
+            });
+        });
+
+        scene("ranking", () => {
+            setGravity(0);
+            const header = add([
+                text("Ranking", { size: 32, align: "center", width: width() - 40 }),
+                pos(width() / 2, 40),
+                anchor("center"),
+                fixed(),
+            ]);
+            let ranking = [];
+            try {
+                const stored = localStorage.getItem("ranking");
+                if (stored) {
+                    ranking = JSON.parse(stored);
+                    if (!Array.isArray(ranking)) ranking = [];
+                }
+            } catch (e) {
+                ranking = [];
+            }
+            const maxDisplay = 10;
+            ranking.slice(0, maxDisplay).forEach((entry, idx) => {
+                add([
+                    text(`${idx + 1}. ${entry.name}: ${entry.score}`, { size: 24, align: "center", width: width() - 40 }),
+                    pos(width() / 2, 80 + idx * 30),
+                    anchor("center"),
+                    fixed(),
+                ]);
+            });
+            add([
+                text("Press Enter to play again", { size: 16, align: "center", width: width() - 40 }),
+                pos(width() / 2, height() - 60),
+                anchor("center"),
+                fixed(),
+            ]);
+            onKeyPress("enter", () => {
+                go("cover"); // Loop all the way back to the cover screen!
+            });
+        });
+
+        scene("game", ({ level }) => {
+            if (level === 1) {
+                score = 0;
+            }
+
+            const scoreText = add([
+                text(`Score: ${score}`, { size: 20 }),
+                pos(10, 10),
+                fixed(),
+                z(100),
+            ]);
+            
+            const levelText = add([
+                text(`Level: ${level}`, { size: 20 }),
+                pos(10, 40),
+                fixed(),
+                z(100),
+            ]);
+
+            const scoreTimer = loop(1, () => {
+                score++;
+                scoreText.text = `Score: ${score}`;
+            });
+            
+            setGravity(1200);
+
+            const floorHeight = 40;
+            add([
+                rect(width(), floorHeight),
+                pos(0, height() - floorHeight),
+                area(),
+                body({ isStatic: true }),
+                color(0, 180, 0),
+                z(-1),
+            ]);
+
+            const platforms = [
+                { w: 180, h: 20, x: 140, y: 320 },
+                { w: 150, h: 20, x: 380, y: 250 },
+            ];
+            platforms.forEach(({ w, h, x, y }) => {
+                add([
+                    rect(w, h),
+                    pos(x, y),
+                    area(),
+                    body({ isStatic: true }),
+                    color(0, 150, 0),
+                    z(-1),
+                ]);
+            });
+
+            const bossPlatformWidth = 200;
+            const bossPlatformHeight = 20;
+            const bossPlatformX = width() - bossPlatformWidth - 40;
+            const bossPlatformY = 180;
+            add([
+                rect(bossPlatformWidth, bossPlatformHeight),
+                pos(bossPlatformX, bossPlatformY),
+                area(),
+                body({ isStatic: true }),
+                color(0, 130, 0),
+                z(-1),
+            ]);
+
+            const PLAYER_SPEED = 200;
+            const JUMP_FORCE = 500;
+
+            const player = add([
+                text("🦖", { size: 32 }),
+                pos(60, height() - floorHeight - 60),
+                area(),
+                anchor("center"),
+                body(),
+                scale(-1, 1),
+                color(0, 0, 255), 
+                "player",
+            ]);
+
+            const boss = add([
+                sprite("boss-img"),
+                pos(bossPlatformX + bossPlatformWidth / 2, bossPlatformY - 10),
+                area(),
+                anchor("center"),
+                body({ isStatic: true }),
+                scale(0.5),
+                "boss",
+            ]);
+
+            boss.onUpdate(() => {
+                boss.scale.x = player.pos.x < boss.pos.x ? -Math.abs(boss.scale.x) : Math.abs(boss.scale.x);
+            });
+
+            function spawnCotolette() {
+                const horizontalSpeed = rand(80, 160);
+                const verticalForce = rand(300, 500);
+                const coto = add([
+                    text("🥩", { size: 24 }),
+                    pos(boss.pos.x - 20, boss.pos.y),
+                    area(),
+                    anchor("center"),
+                    body(),
+                    move(vec2(-1, 0), horizontalSpeed),
+                    offscreen({ destroy: true }),
+                    "cotolette",
+                ]);
+                coto.jump(verticalForce);
+            }
+
+            let spawnRate = 5;
+            if (level === 2) spawnRate = 3;
+            if (level === 3) spawnRate = 1.5;
+
+            loop(spawnRate, () => {
+                spawnCotolette();
+            });
+
+            onKeyDown("left", () => {
+                player.move(-PLAYER_SPEED, 0);
+            });
+            onKeyDown("right", () => {
+                player.move(PLAYER_SPEED, 0);
+            });
+
+            onKeyPress("space", () => {
+                if (player.isGrounded()) {
+                    player.jump(JUMP_FORCE);
+                }
+            });
+
+            player.onCollide("cotolette", (coto) => {
+                destroy(player);
+                destroyAll("cotolette");
+                add([
+                    text("COTOLETTINE!", {
+                        size: 48,
+                    }),
+                    color(255, 0, 0),
+                    pos(width() / 2, height() / 2),
+                    anchor("center"),
+                    fixed(),
+                    z(100),
+                ]);
+                wait(2, () => {
+                    finishGame(false);
+                });
+            });
+
+            player.onCollide("boss", (b) => {
+                if (player.pos.y < b.pos.y) {
+                    destroy(b);
+                    destroyAll("cotolette");
+                    destroy(player);
+                    
+                    if (level < 3) {
+                        add([
+                            text(`LEVEL ${level} COMPLETE!`, {
+                                size: 32,
+                                align: "center",
+                                width: width() - 40,
+                            }),
+                            color(0, 128, 0),
+                            pos(width() / 2, height() / 2),
+                            anchor("center"),
+                            fixed(),
+                            z(100),
+                        ]);
+                        wait(3, () => {
+                            go("game", { level: level + 1 });
+                        });
+                    } else {
+                        add([
+                            text(
+                                "YOU WON! CONGRATS YOU WERE FASTER THAN LILLO'S COTOLETTINE,\nWITH SUCH A SPEED YOU CAN RUN A MARATHON IN UNDER 3 HOURS",
+                                {
+                                    size: 32,
+                                    align: "center",
+                                    width: width() - 40,
+                                    lineSpacing: 4,
+                                },
+                            ),
+                            color(0, 128, 0),
+                            pos(width() / 2, height() / 2),
+                            anchor("center"),
+                            fixed(),
+                            z(100),
+                        ]);
+                        wait(3, () => {
+                            finishGame(true);
+                        });
+                    }
+                }
+            });
+        });
+
+        // Start the game on the newly created "cover" scene!
+        onLoad(() => {
+            go("cover");
+        });
+    </script>
+</body>
+</html>
